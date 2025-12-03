@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Lesson } from '../types';
-import { COURSE_CONTENT } from '../constants';
-import { playTextToSpeech, generateExplanation } from '../geminiService';
+import { Lesson } from './types';
+import { COURSE_CONTENT } from './constants';
+import { playTextToSpeech, generateExplanation } from './geminiService';
 import { ArrowLeft, Volume2, Sparkles, MessageCircle, BookOpen, PlayCircle, Mic, Loader2 } from 'lucide-react';
 
 interface LessonDetailProps {
@@ -15,7 +15,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({ lessonId, onBack }) => {
   const [explanation, setExplanation] = useState<string | null>(null);
   const [loadingExpl, setLoadingExpl] = useState(false);
   
-  // 新增：追踪哪个正在播放，用于显示加载动画
+  // Track which item is currently loading/playing to show the spinner
   const [playingItem, setPlayingItem] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,13 +30,14 @@ const LessonDetail: React.FC<LessonDetailProps> = ({ lessonId, onBack }) => {
   if (!lesson) return <div className="p-8 text-center text-slate-500">Loading...</div>;
 
   const handlePlayAudio = async (text: string, id: string, voice: any = 'Kore') => {
-      if (playingItem === id) return; // 防止重复点击
+      // Prevent multiple clicks on the same item while loading
+      if (playingItem === id) return;
       
-      setPlayingItem(id); // 开始转圈
+      setPlayingItem(id);
       try {
         await playTextToSpeech(text, voice);
       } finally {
-        // 1秒后停止转圈（给用户一点视觉反馈）
+        // Keep spinner briefly to show feedback, then reset
         setTimeout(() => setPlayingItem(null), 1000); 
       }
   };
@@ -51,6 +52,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({ lessonId, onBack }) => {
 
   return (
     <div className="flex flex-col h-screen bg-[#F3F0FF] overflow-hidden">
+      {/* Immersive Header */}
       <div className="bg-white px-6 pt-6 pb-4 shadow-sm z-20 rounded-b-[2rem]">
         <div className="flex items-center gap-4 mb-4 mt-8">
             <button onClick={onBack} className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
@@ -63,6 +65,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({ lessonId, onBack }) => {
             <div className="text-3xl">{lesson.icon}</div>
         </div>
 
+        {/* Floating Tabs */}
         <div className="flex bg-slate-100 p-1 rounded-xl">
             {['vocab', 'phrases', 'scenario'].map((tab) => (
                 <button
@@ -83,6 +86,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({ lessonId, onBack }) => {
         </div>
       </div>
 
+      {/* Main Content - Scrollable */}
       <div className="flex-1 overflow-y-auto no-scrollbar p-6 pb-24">
         
         {activeTab === 'vocab' && (
