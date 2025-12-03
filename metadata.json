@@ -1,0 +1,7 @@
+{
+  "name": "Lumière French",
+  "description": "An immersive A1-A2 French learning companion focusing on daily vocabulary, phrases, and real-life scenarios with AI-powered pronunciation and roleplay.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
